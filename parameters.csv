@@ -1,0 +1,3 @@
+mass, lifetime, numberDensity, muonBranching, pionBranching, lifetimeFactor, decayFile
+900, 0.05, 0.790653, 0.0, 1.434, 10, decayProbabilities.csv
+1, 0.1,5963.87, 0.0, 0.0, 10, None

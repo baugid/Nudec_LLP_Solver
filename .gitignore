@@ -1,0 +1,6 @@
+#ignore cache files
+**/__pycache__
+
+#ignore folders holding IDE information
+.idea/
+.vscode/
