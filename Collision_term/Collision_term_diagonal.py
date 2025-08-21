@@ -169,7 +169,7 @@ def Collision_term_diagonal(x, z, ni, i, f_nue, f_numu, f_nutau, f_nue_bar, f_nu
                 Coll[2] = Coll[2] + overall_fac_ann \
                           * (fe_l * fe_k * (1 - f_nutau[ni]) * (1 - f_nutau_bar[nj]) * (
                         Pi_ann1 * 2 * gLtilde ** 2 + Pi_ann2 * 2 * gR ** 2 + Pi_ann3 * 4 * gLtilde * gR) \
-                             - (1 - fe_k) * (1 - fe_l) * f_nue[ni] * f_nutau_bar[nj] * (
+                             - (1 - fe_k) * (1 - fe_l) * f_nutau[ni] * f_nutau_bar[nj] * (
                                      Pi_ann1 * 2 * gLtilde ** 2 + Pi_ann2 * 2 * gR ** 2 + Pi_ann3 * 4 * gLtilde * gR))
 
     return Coll
