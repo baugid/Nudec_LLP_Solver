@@ -9,23 +9,31 @@ The non-equilibrium evolution of the injected metastable particles: decays, anni
 
 ## How to use (key study)
 
-Focus on EM-philic/neutrinophilic decays, and energy conservation checks. 
+Focus on EM-philic/neutrinophilic decays, and energy conservation checks. More info: [ChatGPT chat](https://chatgpt.com/share/69ce552a-2f74-8390-ae7e-a26c90c3a57a)
 
-
-Key example launches:
+Main file: `basicRunner_cli.py`. Before launching, change the following line to the appropriate one:
 
 ```
-python /eos/user/o/ovchynni/Nu_Decoupling_Simple/basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 101 --ifDebugging False 
+OUTPUT_ROOT_DEFAULT = Path("/eos/user/o/ovchynni/Traditional")
+```
+
+In case of additional problems, contact me.
+
+Launches:
+
+```
+python basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 101 --ifDebugging False 
 ```
 ```
-python /eos/user/o/ovchynni/Nu_Decoupling_Simple/basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 101 --ifDebugging True
+python basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 101 --ifDebugging True
 ``` 
 
 ```
-python /eos/user/o/ovchynni/Nu_Decoupling_Simple/basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 201 --ifDebugging False
+python basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 201 --ifDebugging False
 ```
+
 ```
-python /eos/user/o/ovchynni/Nu_Decoupling_Simple/basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 201 --ifDebugging True
+python basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 201 --ifDebugging True
 ```
 
 The output:
@@ -46,3 +54,4 @@ T_start = 5.1101422997e+00 MeV T_fin = 2.4209828181e-02 MeV n_nu_e/n_gamma = 2.0
 T_start = 5.1101422997e+00 MeV T_fin = 2.4382902451e-02 MeV n_nu_e/n_gamma = 2.0796659183e-01 n_nu_mu/n_gamma = 1.8757746964e-01 n_nu_tau/n_gamma = 1.8757742551e-01 ((a*T)_start/(a*T)_fin)^3 = 2.1470326317e-01 N_eff = 2.6312268193e+00 Accepted steps = 1056 RHS evaluations = 3323 Runtime = 3066.2598 s
 ```
 
+The output shows that there is likely an issue with the energy conservation of neutrino self-interaction collision integral that does not shrink if increasing the number of bins, and its cumulative impact of Delta N_eff is non-negligible.  
