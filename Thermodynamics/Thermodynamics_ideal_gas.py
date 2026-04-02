@@ -1,123 +1,139 @@
-"""
-Here some thermodynamic quantities in the ideal gas limit are calculated. 
-See Section 2.3 and Appendix A in K. Akita and M. Yamaguchi, arXiv: 2210.10307 for details. The equation numbers always reference 2210.10307.
-"""
 import numpy as np
 from scipy import integrate
 from Constants import *
 import Momentum_Grid
+def Energy_density_ideal_gas(x,z,f_nue,f_numu,f_nutau,f_nue_bar,f_numu_bar,f_nutau_bar):
 
+    #energy densities in comoving volume
 
-def Energy_density_ideal_gas(x, z, f_nue, f_numu, f_nutau, f_nue_bar, f_numu_bar, f_nutau_bar):
-    y = Momentum_Grid.gridVals
+    y = Momentum_Grid.gridVals #(comoving) momentum
 
-    Integrand_rho_e_bar = y ** 2 * (y ** 2 + x ** 2) ** (1 / 2) / (np.exp((y ** 2 + x ** 2) ** (1 / 2) / z) + 1)
-    Integrand_rho_nu_bar = y ** 3 * (f_nue + f_numu + f_nutau + f_nue_bar + f_numu_bar + f_nutau_bar)
+    Integrand_rho_e_bar = y**2*(y**2 + x**2)**(1/2)/(np.exp((y**2 + x**2)**(1/2)/z) + 1)
+    Integrand_rho_nu_bar = y**3*(f_nue+f_numu+f_nutau+f_nue_bar+f_numu_bar+f_nutau_bar)
 
-    # Energy density for e^\pm in comoving volume
-    rho_e_bar = 2 / (np.pi ** 2) * np.sum(Integrand_rho_e_bar * Momentum_Grid.gridWeights)
-    # Total neutrino and anti-neutrino energy density
-    rho_nu_bar = 1 / (2 * np.pi ** 2) * np.sum(Integrand_rho_nu_bar * Momentum_Grid.gridWeights)
+    rho_e_bar = 2/(np.pi**2)*np.sum(Integrand_rho_e_bar*Momentum_Grid.gridWeights) #Energy density for e^\pm in comoving volume
+    rho_nu_bar = 1/(2*np.pi**2)*np.sum(Integrand_rho_nu_bar*Momentum_Grid.gridWeights) #Total neutrino and anti-neutrino energy density
 
     return rho_e_bar, rho_nu_bar
 
 
-def Functions_in_z_ideal_gas(x, z):
-    J_return = J(x, z)
-    Y_return = Y(x, z)
+def Energy_density_ideal_gas_mu_pi(x,z):
+
+    #energy densities in comoving volume
+
+    y = Momentum_Grid.gridVals #(comoving) momentum
+
+    Integrand_rho_mu_bar = y**2*(y**2 + (mmu/me)**2*x**2)**(1/2)/(np.exp((y**2 + (mmu/me)**2*x**2)**(1/2)/z) + 1)
+    rho_mu_bar = 2/(np.pi**2)*np.sum(Integrand_rho_mu_bar*Momentum_Grid.gridWeights) #Energy density for mu^\pm in comoving volume
+
+
+    Integrand_rho_pi_bar = 3/(2*np.pi**2)*y**2*(y**2 + (mpi/me)**2*x**2)**(1/2)/(np.exp((y**2 + (mpi/me)**2*x**2)**(1/2)/z) - 1)
+    rho_pi_bar = np.sum(Integrand_rho_pi_bar*Momentum_Grid.gridWeights) #energy density for total pion in comoving volume
+
+    return rho_mu_bar, rho_pi_bar
+
+
+def Functions_in_z_ideal_gas(x,z):
+
+    J_return = J(x,z)
+    Y_return = Y(x,z)
 
     return J_return, Y_return
 
+def Functions_in_z_ideal_gas_mu_pi(x,z):
 
-def Functions_in_z_ideal_gas_mu_pi(x, z):
-    Jmu_return = Jmu(x, z)
 
-    Ymu_return = Ymu(x, z)
+    Jmu_return = Jmu(x,z)
 
-    Jpi_return = Jpi(x, z)
+    Ymu_return = Ymu(x,z)
 
-    Ypi_return = Ypi(x, z)
+    Jpi_return = Jpi(x,z)
+
+    Ypi_return = Ypi(x,z)
+
 
     return Jmu_return, Ymu_return, Jpi_return, Ypi_return
 
 
-def J(x, z): #(A.17)
-    y = np.linspace(Momentum_Grid.yQED_min, Momentum_Grid.yQED_max, Momentum_Grid.n_QED)
-    u = y / z
-    w = x / z
-    dudy = 1 / z
+def J(x,z):
 
-    Integrand_J = u ** 2 * np.exp((u ** 2 + w ** 2) ** (1 / 2)) / (np.exp((u ** 2 + w ** 2) ** (1 / 2)) + 1) ** 2
+    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    u    = y/z
+    w    = x/z
+    dudy = 1/z
 
-    J = dudy * 1 / (np.pi ** 2) * integrate.simpson(Integrand_J, x=y)
+    Integrand_J = u**2*np.exp((u**2 + w**2)**(1/2))/(np.exp((u**2+w**2)**(1/2)) + 1)**2
+
+    J = dudy*1/(np.pi**2)*integrate.simpson(Integrand_J,x=y)
 
     return J
 
 
-def Y(x, z): #(A.17)
-    y = np.linspace(Momentum_Grid.yQED_min, Momentum_Grid.yQED_max, Momentum_Grid.n_QED)
-    u = y / z
-    w = x / z
-    dudy = 1 / z
 
-    Integrand_Y = u ** 4 * np.exp((u ** 2 + w ** 2) ** (1 / 2)) / (np.exp((u ** 2 + w ** 2) ** (1 / 2)) + 1) ** 2
+def Y(x,z):
 
-    Y = dudy * 1 / (np.pi ** 2) * integrate.simpson(Integrand_Y, x=y)
+    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    u    = y/z
+    w    = x/z
+    dudy = 1/z
+
+    Integrand_Y = u**4*np.exp((u**2 + w**2)**(1/2))/(np.exp((u**2+w**2)**(1/2)) + 1)**2
+
+    Y =  dudy*1/(np.pi**2)*integrate.simpson(Integrand_Y,x=y)
 
     return Y
 
+def Jmu(x,z):
 
-def Jmu(x, z): #(A.17) for muons
-    y = np.linspace(Momentum_Grid.yQED_min, Momentum_Grid.yQED_max, Momentum_Grid.n_QED)
-    u = y / z
-    w = x / z
-    dudi = 1 / z
+    y    = np.linspace(Momentum_Grid.y_min,Momentum_Grid.y_max,Momentum_Grid.n)
+    u    = y/z
+    w    = x/z
+    dudi = 1/z
 
-    Integrand_Jmu = dudi * 1 / (np.pi ** 2) * u ** 2 * np.exp((u ** 2 + (mmu / me) ** 2 * w ** 2) ** (1 / 2)) / (
-            np.exp((u ** 2 + (mmu / me) ** 2 * w ** 2) ** (1 / 2)) + 1) ** 2
+    Integrand_Jmu = dudi*1/(np.pi**2)*u**2*np.exp((u**2 + (mmu/me)**2*w**2)**(1/2))/(np.exp((u**2+(mmu/me)**2*w**2)**(1/2)) + 1)**2
 
-    Jmu = integrate.simpson(Integrand_Jmu, x=y)
+    Jmu = integrate.simpson(Integrand_Jmu,x=y)
 
     return Jmu
 
 
-def Jpi(x, z): #(A.17) for pions
-    y = np.linspace(Momentum_Grid.yQED_min, Momentum_Grid.yQED_max, Momentum_Grid.n_QED)
-    u = y / z
-    w = x / z
-    dudi = 1 / z
+def Jpi(x,z):
 
-    Integrand_Jpi = dudi * 1 / (np.pi ** 2) * u ** 2 * np.exp((u ** 2 + (mpi / me) ** 2 * w ** 2) ** (1 / 2)) / (
-            np.exp((u ** 2 + (mpi / me) ** 2 * w ** 2) ** (1 / 2)) - 1) ** 2
+    y    = Momentum_Grid.gridVals
+    u    = y/z
+    w    = x/z
+    dudi = 1/z
 
-    Jpi = integrate.simpson(Integrand_Jpi, x=y)
+    Integrand_Jpi = dudi*1/(np.pi**2)*u**2*np.exp((u**2 + (mpi/me)**2*w**2)**(1/2))/(np.exp((u**2+(mpi/me)**2*w**2)**(1/2)) - 1)**2
+
+    Jpi = np.sum(Integrand_Jpi*Momentum_Grid.gridWeights)
 
     return Jpi
 
 
-def Ymu(x, z):
-    y = np.linspace(Momentum_Grid.yQED_min, Momentum_Grid.yQED_max, Momentum_Grid.n_QED)
-    u = y / z
-    w = x / z
-    dudi = 1 / z
+def Ymu(x,z):
 
-    Integrand_Ymu = dudi * 1 / (np.pi ** 2) * u ** 4 * np.exp((u ** 2 + (mmu / me) ** 2 * w ** 2) ** (1 / 2)) / (
-            np.exp((u ** 2 + (mmu / me) ** 2 * w ** 2) ** (1 / 2)) + 1) ** 2
+    y    = Momentum_Grid.gridVals
+    u    = y/z
+    w    = x/z
+    dudi = 1/z
 
-    Ymu = integrate.simpson(Integrand_Ymu, x=y)
+    Integrand_Ymu = dudi*1/(np.pi**2)*u**4*np.exp((u**2 + (mmu/me)**2*w**2)**(1/2))/(np.exp((u**2 + (mmu/me)**2*w**2)**(1/2)) + 1)**2
+
+    Ymu =  np.sum(Integrand_Ymu*Momentum_Grid.gridWeights)
 
     return Ymu
 
 
-def Ypi(x, z):
-    y = np.linspace(Momentum_Grid.yQED_min, Momentum_Grid.yQED_max, Momentum_Grid.n_QED)
-    u = y / z
-    w = x / z
-    dudi = 1 / z
+def Ypi(x,z):
 
-    Integrand_Ypi = dudi * 1 / (np.pi ** 2) * u ** 4 * np.exp((u ** 2 + (mpi / me) ** 2 * w ** 2) ** (1 / 2)) / (
-            np.exp((u ** 2 + (mpi / me) ** 2 * w ** 2) ** (1 / 2)) - 1) ** 2
+    y    = Momentum_Grid.gridVals
+    u    = y/z
+    w    = x/z
+    dudi = 1/z
 
-    Ypi = integrate.simpson(Integrand_Ypi, x=y)
+    Integrand_Ypi = dudi*1/(np.pi**2)*u**4*np.exp((u**2 + (mpi/me)**2*w**2)**(1/2))/(np.exp((u**2 + (mpi/me)**2*w**2)**(1/2)) - 1)**2
+
+    Ypi =  np.sum(Integrand_Ypi*Momentum_Grid.gridWeights)
 
     return Ypi

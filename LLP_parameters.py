@@ -1,18 +1,9 @@
-"""
-Parameter file for the SingleShot.py script.
-"""
-
-llp_mass = 900  # mass in MeV
-llp_lifetime = 0.05  # lifetime in s
-llp_density = 0.790653  # initial abundance in MeV^3
-llp_muonBranching = 0.0  # avg number of primary muons per LLP decay
-llp_pionBranching = 1.434  # avg number of primary pions per LLP decay (x->pi+ pi- produces two pions)
-llp_twoNuDecayE = 0.  # branching to two nu decay
-llp_twoNuDecayMu = 0.
-llp_twoNuDecayTau = 0.
-llp_lifetimeFactor = 10  # cutoff for LLP injection at lifetime*lifetimeFactor.
-
-useDecayProbabilities = True # if true the file specified in the next line is loaded
-llp_probabilityPath = "decayProbabilities.csv" # path to the decay probabilities
-
-outputFile = "results.txt" # path to the output file. Set to None to ignore
+llp_mass = 1000  # mass in MeV
+llp_lifetime = 1  # lifetime in s
+llp_abundance = 6.036 # number density at T = 5.11 MeV in MeV^3
+llp_pionBranching = 0.0  # avg number of primary charged pions per llp decay (x->pi+ pi- produces two pions)
+llp_muonBranching = 0.0  # avg number of primary muons per llp decay
+lifetimeFactor = 10  # cutoff for LLP injection at lifetime*lifetimeFactor.
+llp_twoNuDecayE = 0.3333  # branching to two nu decay
+llp_twoNuDecayMu = 0.3333
+llp_twoNuDecayTau = 0.3334

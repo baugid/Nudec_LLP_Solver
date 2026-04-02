@@ -1,8 +1,6 @@
-"""
-This file controls the discretization of the momentum.
-"""
 import numpy as np
 import numpy.polynomial.polynomial as Poly
+from scipy.special import roots_legendre
 
 
 def getIntegrationWeights(xCoords):
@@ -25,23 +23,23 @@ def getIntegrationWeights(xCoords):
     return weigths
 
 
-def summedWeights(gridPoints, window=3):
+def summedWeights(gridPoints, windowlen=3):
     """
-    Computes the weights for a summed quadrature function.
-    Note that len(gridPoints) mod (window-1) has to be 1.
+    Computes the weights for a summed quadrature function
     :param gridPoints: The sampling points
-    :param window: The number of points for each quadrature
+    :param windowlen: The number of points for each quadrature
     :return: An numpy array containing the corresponding weights
     """
     # grid weights for simpson rule (windowlen=3)
     # or trapezoidal rule (windowlen=2)
-    assert len(gridPoints) % (window - 1) == 1
+    # note that n mod (windowlen-1) has to be 1
+    assert len(gridPoints) % (windowlen - 1) == 1
 
     pts = len(gridPoints)
     weigths = np.zeros(pts)
 
-    for x in range(0, pts - window + 1, window - 1):
-        weigths[x:x + window] += getIntegrationWeights(gridPoints[x: x + window])
+    for x in range(0, pts - windowlen + 1, windowlen - 1):
+        weigths[x:x + windowlen] += getIntegrationWeights(gridPoints[x: x + windowlen])
     return weigths
 
 
@@ -49,7 +47,7 @@ def convertRegions(edges, binCount):
     """
     Compute the sampling points and edges for a segmented linear grid.
     :param edges: The starting and end points of all the linear sections
-    :param binCount: A list of the number of bins in each section. len(binCount)==len(edges)-1 has to be fulfilled
+    :param binCount: A list of the number of bins in each sections. len(binCount)==len(edges)-1 has to be fulfilled
     :return: A tuple containing the sampling points and weights
     """
     totalBins = np.sum(binCount)
@@ -68,30 +66,47 @@ def convertRegions(edges, binCount):
 debug_grid = False
 
 
-# Set up the default linear grid, with y_max y_min and n_p as given in the arguments
+#Setup the default linear grid, with y_max y_min and n_p as given in the arguments
 def setupGrid(y_max_p, n_p, y_min_p=0.01):
-    """
-    Set up the momentum grid. This method must be called before any variable related to the grid is usable.
-    The global variables set by this method are n, y_max, y_min, gridVals and gridWeights for the neutrino grid.
-    Also some values for the electromagnetic grid are set: n_QED, yQED_max, yQED_min, dyQED
-    :param y_max_p: Maximum comoving momentum in MeV
-    :param n_p: Number of grid bins
-    :param y_min_p: Minimum comoving momentum in MeV
-    """
     global n, y_max, y_min, gridVals, gridWeights, n_QED, yQED_max, yQED_min, dyQED
     n = n_p
     y_max = y_max_p
     y_min = y_min_p
 
     gridVals = np.linspace(y_min, y_max, n)
+    # gridVals = np.logspace(np.log10(y_min), np.log10(y_max), n)
 
     gridVals[0] = y_min
     gridVals[-1] = y_max  # ensure that this holds exactly
     gridWeights = summedWeights(gridVals, 3)
-
-    # QED grid parameters, they do not depend on the LLP model chosen.
+    # QED grid parameters
     n_QED = 81
 
     yQED_max = 20
     yQED_min = 0.01
     dyQED = (yQED_max - yQED_min) / (n_QED - 1)
+
+# Old test code do not blindly uncomment
+
+# n = 81  # 201  # number of bins, n must be an odd number because we use the Simpson method
+# The actual momentum grid is n-1.
+
+# y_max = 20  # 110  # 2070
+# y_min = 0.01
+# dy = (y_max - y_min) / (n - 1)
+
+# gridVals = np.linspace(y_min, y_max, n)
+# gridVals = np.logspace(np.log10(y_min), np.log10(y_max), n)
+
+# gridVals[0] = y_min
+# gridVals[-1] = y_max  # ensure that this holds exactly
+# gridWeights = summedWeights(gridVals, 3)
+
+# gridVals, gridWeights = convertRegions([y_min, 10.,y_max], [41,100])
+# n=len(gridVals)
+
+
+# gauss legendre
+# gridVals, gridWeights = roots_legendre(n)
+# gridVals = (gridVals + 1) * (y_max / 2)
+# gridWeights = gridWeights * y_max / 2

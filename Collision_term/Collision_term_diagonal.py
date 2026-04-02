@@ -5,7 +5,10 @@ See Section 2.2.4, Appendix A and B in K. Akita and M. Yamaguchi, arXiv: 2210.10
 
 import numpy as np
 from numba import jit
-from Collision_term.D_function import D_function
+try:
+    from Collision_term.D_function import D_function
+except ModuleNotFoundError:
+    from D_function import D_function
 from Constants import *
 import Momentum_Grid
 
@@ -171,5 +174,63 @@ def Collision_term_diagonal(x, z, ni, i, f_nue, f_numu, f_nutau, f_nue_bar, f_nu
                         Pi_ann1 * 2 * gLtilde ** 2 + Pi_ann2 * 2 * gR ** 2 + Pi_ann3 * 4 * gLtilde * gR) \
                              - (1 - fe_k) * (1 - fe_l) * f_nutau[ni] * f_nutau_bar[nj] * (
                                      Pi_ann1 * 2 * gLtilde ** 2 + Pi_ann2 * 2 * gR ** 2 + Pi_ann3 * 4 * gLtilde * gR))
+
+    return Coll
+
+
+
+@jit(nopython=True, nogil=True, fastmath=True)
+def Collision_term_self_only(x, z, ni, i, f_nue, f_numu, f_nutau, f_nue_bar, f_numu_bar, f_nutau_bar, delta_me):
+    """Return only the neutrino self-interaction contribution to the diagonal collision term."""
+    Coll = np.zeros(3)
+
+    for nk in range(Momentum_Grid.n):
+        k = Momentum_Grid.gridVals[nk]
+
+        for nj in range(Momentum_Grid.n):
+            j = Momentum_Grid.gridVals[nj]
+
+            lPre = i + j - k
+            if Momentum_Grid.y_min <= lPre <= Momentum_Grid.y_max:
+                nlPre = np.searchsorted(Momentum_Grid.gridVals, lPre)
+                if nlPre == 0:
+                    nl = 0
+                elif nlPre == Momentum_Grid.n:
+                    nl = nlPre - 1
+                elif Momentum_Grid.gridVals[nlPre] - lPre > lPre - Momentum_Grid.gridVals[nlPre - 1]:
+                    nl = nlPre - 1
+                else:
+                    nl = nlPre
+
+                l = Momentum_Grid.gridVals[nl]
+
+                D1, D2_34, D2_12, D2_13, D2_14, D2_23, D2_24, D3 = D_function(i, j, k, l)
+
+                Pi_self1 = 2 * (3 * D1 - 2 * D2_14 / (i * l) - 2 * D2_23 / (j * k) + D2_12 / (i * j) + D2_34 / (k * l) + 3 * D3 / (i * j * k * l))
+                Pi_self2 = 2 * D1 + D2_12 / (i * j) + D2_34 / (k * l) - D2_14 / (i * l) - D2_23 / (j * k) + 2 * D3 / (i * j * k * l)
+                Pi_self3 = D1 - D2_23 / (j * k) - D2_14 / (i * l) + D3 / (i * j * k * l)
+
+                overall_fac_self = GF ** 2 / (2 * np.pi ** 3 * i) * j * k * l * Momentum_Grid.gridWeights[nk] * Momentum_Grid.gridWeights[nj]
+
+                Coll[0] = Coll[0] + overall_fac_self \
+                          * ((f_nue[nk] * (1 - f_nue[ni]) * f_nue[nl] * (1 - f_nue[nj]) - f_nue[ni] * (1 - f_nue[nk]) * f_nue[nj] * (1 - f_nue[nl])) * Pi_self1 \
+                             + (f_nue[nk] * (1 - f_nue[ni]) * f_numu[nl] * (1 - f_numu[nj]) - f_nue[ni] * (1 - f_nue[nk]) * f_numu[nj] * (1 - f_numu[nl])) * Pi_self2 \
+                             + (f_numu[nk] * f_numu[nl] * (1 - f_nue[ni]) * (1 - f_nue[nj]) - f_nue[ni] * f_nue[nj] * (1 - f_numu[nk]) * (1 - f_numu[nl])) * Pi_self3 \
+                             + (f_nue[nk] * (1 - f_nue[ni]) * f_nutau[nl] * (1 - f_nutau[nj]) - f_nue[ni] * (1 - f_nue[nk]) * f_nutau[nj] * (1 - f_nutau[nl])) * Pi_self2 \
+                             + (f_nutau[nk] * f_nutau[nl] * (1 - f_nue[ni]) * (1 - f_nue[nj]) - f_nue[ni] * f_nue[nj] * (1 - f_nutau[nk]) * (1 - f_nutau[nl])) * Pi_self3)
+
+                Coll[1] = Coll[1] + overall_fac_self \
+                          * ((f_numu[nk] * (1 - f_numu[ni]) * f_numu[nl] * (1 - f_numu[nj]) - f_numu[ni] * (1 - f_numu[nk]) * f_numu[nj] * (1 - f_numu[nl])) * Pi_self1 \
+                             + (f_numu[nk] * (1 - f_numu[ni]) * f_nue[nl] * (1 - f_nue[nj]) - f_numu[ni] * (1 - f_numu[nk]) * f_nue[nj] * (1 - f_nue[nl])) * Pi_self2 \
+                             + (f_nue[nk] * f_nue[nl] * (1 - f_numu[ni]) * (1 - f_numu[nj]) - f_numu[ni] * f_numu[nj] * (1 - f_nue[nk]) * (1 - f_nue[nl])) * Pi_self3 \
+                             + (f_numu[nk] * (1 - f_numu[ni]) * f_nutau[nl] * (1 - f_nutau[nj]) - f_numu[ni] * (1 - f_numu[nk]) * f_nutau[nj] * (1 - f_nutau[nl])) * Pi_self2 \
+                             + (f_nutau[nk] * f_nutau[nl] * (1 - f_numu[ni]) * (1 - f_numu[nj]) - f_numu[ni] * f_numu[nj] * (1 - f_nutau[nk]) * (1 - f_nutau[nl])) * Pi_self3)
+
+                Coll[2] = Coll[2] + overall_fac_self \
+                          * ((f_nutau[nk] * (1 - f_nutau[ni]) * f_nutau[nl] * (1 - f_nutau[nj]) - f_nutau[ni] * (1 - f_nutau[nk]) * f_nutau[nj] * (1 - f_nutau[nl])) * Pi_self1 \
+                             + (f_nutau[nk] * (1 - f_nutau[ni]) * f_nue[nl] * (1 - f_nue[nj]) - f_nutau[ni] * (1 - f_nutau[nk]) * f_nue[nj] * (1 - f_nue[nl])) * Pi_self2 \
+                             + (f_nue[nk] * f_nue[nl] * (1 - f_nutau[ni]) * (1 - f_nutau[nj]) - f_nutau[ni] * f_nutau[nj] * (1 - f_nue[nk]) * (1 - f_nue[nl])) * Pi_self3 \
+                             + (f_nutau[nk] * (1 - f_nutau[ni]) * f_numu[nl] * (1 - f_numu[nj]) - f_nutau[ni] * (1 - f_nutau[nk]) * f_numu[nj] * (1 - f_numu[nl])) * Pi_self2 \
+                             + (f_numu[nk] * f_numu[nl] * (1 - f_nutau[ni]) * (1 - f_nutau[nj]) - f_nutau[ni] * f_nutau[nj] * (1 - f_numu[nk]) * (1 - f_numu[nl])) * Pi_self3)
 
     return Coll
