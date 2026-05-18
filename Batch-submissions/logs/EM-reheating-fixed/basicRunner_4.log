@@ -1,0 +1,44 @@
+040 (11608109.004.000) 05/18 12:13:30 Started transferring input files
+	Transferring to host: <188.185.194.50:9618?addrs=188.185.194.50-9618+[2001-1458-303-21--100-2e]-9618&alias=b9p20p6000.cern.ch&noUDP&sock=slot1_40_1312371_d790_177348>
+...
+040 (11608109.004.000) 05/18 12:13:30 Finished transferring input files
+...
+001 (11608109.004.000) 05/18 12:13:30 Job executing on host: <188.185.194.50:9618?addrs=188.185.194.50-9618+[2001-1458-303-21--100-2e]-9618&alias=b9p20p6000.cern.ch&noUDP&sock=startd_5395_1988>
+	SlotName: slot1_40@b9p20p6000.cern.ch
+	CondorScratchDir = "/pool/condor/dir_293882"
+	Cpus = 1
+	Disk = 3823
+	GPUs = 0
+	Memory = 3000
+...
+006 (11608109.004.000) 05/18 12:13:43 Image size of job updated: 23328
+	23  -  MemoryUsage of job (MB)
+	23328  -  ResidentSetSize of job (KB)
+...
+006 (11608109.004.000) 05/18 12:16:52 Image size of job updated: 109552
+	23  -  MemoryUsage of job (MB)
+	23328  -  ResidentSetSize of job (KB)
+...
+040 (11608109.004.000) 05/18 12:16:52 Started transferring output files
+...
+040 (11608109.004.000) 05/18 12:16:52 Finished transferring output files
+...
+004 (11608109.004.000) 05/18 12:16:52 Job was evicted.
+	(0) CPU times
+		Usr 0 00:02:46, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	405  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :        0        1         1 
+	   Disk (KB)            :       29        1      3823 
+	   GPUs                 :                           0 
+	   Memory (MB)          :       23     3000      3000 
+	   TimeExecute (s)      :      202                    
+	   TimeSlotBusy (s)     :      203                    
+...
+009 (11608109.004.000) 05/18 12:16:52 Job was aborted.
+	via condor_rm (by user ovchynni)
+...
+000 (11608113.004.000) 05/18 12:36:00 Job submitted from host: <188.185.70.244:9618?addrs=188.185.70.244-9618+[2001-1458-d00-7--100-2ee]-9618&alias=bigbird10.cern.ch&noUDP&sock=schedd_3169_3fb7>
+...

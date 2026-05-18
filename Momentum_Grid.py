@@ -23,18 +23,15 @@ def getIntegrationWeights(xCoords):
     return weigths
 
 
-def summedWeights(gridPoints, windowlen=3):
+def summedWeights(gridPoints, windowlen=2):
     """
     Computes the weights for a summed quadrature function
     :param gridPoints: The sampling points
     :param windowlen: The number of points for each quadrature
     :return: An numpy array containing the corresponding weights
     """
-    # grid weights for simpson rule (windowlen=3)
-    # or trapezoidal rule (windowlen=2)
-    # note that n mod (windowlen-1) has to be 1
-    assert len(gridPoints) % (windowlen - 1) == 1
-
+    # Trapezoidal weights are the default; Simpson weights can still be
+    # requested with windowlen=3 for explicit checks.
     pts = len(gridPoints)
     weigths = np.zeros(pts)
 
@@ -59,7 +56,7 @@ def convertRegions(edges, binCount):
     for i in range(2, len(edges)):
         grid[runningTotal - 1:runningTotal + binCount[i - 1]] = np.linspace(edges[i - 1], edges[i], binCount[i - 1] + 1)
         runningTotal += binCount[i - 1]
-    return grid, summedWeights(grid)
+    return grid, summedWeights(grid, 2)
 
 
 # If this is true the distributions will print a warning, when particles would be injected beyond the grid
@@ -78,7 +75,7 @@ def setupGrid(y_max_p, n_p, y_min_p=0.01):
 
     gridVals[0] = y_min
     gridVals[-1] = y_max  # ensure that this holds exactly
-    gridWeights = summedWeights(gridVals, 3)
+    gridWeights = summedWeights(gridVals, 2)
     # QED grid parameters
     n_QED = 81
 
@@ -88,7 +85,7 @@ def setupGrid(y_max_p, n_p, y_min_p=0.01):
 
 # Old test code do not blindly uncomment
 
-# n = 81  # 201  # number of bins, n must be an odd number because we use the Simpson method
+# n = 81  # 201  # number of bins
 # The actual momentum grid is n-1.
 
 # y_max = 20  # 110  # 2070
@@ -100,7 +97,7 @@ def setupGrid(y_max_p, n_p, y_min_p=0.01):
 
 # gridVals[0] = y_min
 # gridVals[-1] = y_max  # ensure that this holds exactly
-# gridWeights = summedWeights(gridVals, 3)
+# gridWeights = summedWeights(gridVals, 2)
 
 # gridVals, gridWeights = convertRegions([y_min, 10.,y_max], [41,100])
 # n=len(gridVals)

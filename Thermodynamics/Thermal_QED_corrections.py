@@ -4,6 +4,11 @@ from Constants import *
 import Momentum_Grid
 
 
+def qed_y_grid(z):
+
+    return z*np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+
+
 def Thermal_QED_corrections_to_energy_density(x,z): #Thermal QED corrections to Hubble parameter (i.e., energy density)
     
     rho_2 = -P_2(x,z) + z*dP_2dz(x,z)
@@ -15,7 +20,7 @@ def Thermal_QED_corrections_to_energy_density(x,z): #Thermal QED corrections to 
 
 def P_2(x,z):
 
-    y = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y = qed_y_grid(z)
 
     Integrand_tmp = y**2/(y**2 + x**2)**(1/2)*2/(np.exp((y**2 + x**2)**(1/2)/z) +1)
 
@@ -29,7 +34,7 @@ def P_2(x,z):
 
 def dP_2dz(x,z):
 
-    y = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y = qed_y_grid(z)
 
     Integrand_tmp1 = y**2/(y**2 + x**2)**(1/2)*2/(np.exp((y**2 + x**2)**(1/2)/z) +1)
 
@@ -47,7 +52,7 @@ def dP_2dz(x,z):
 
 def I(x,z): #(2.54)
     
-    y = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y = qed_y_grid(z)
 
     Integrand_I = (2*y**2 + x**2)/(y**2 + x**2)**(1/2)*2/(np.exp((y**2 + x**2)**(1/2)/z) +1)
 
@@ -59,7 +64,7 @@ def I(x,z): #(2.54)
 
 def dIdz(x,z):
 
-    y = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y = qed_y_grid(z)
 
     Integrand_dIdz = 2*(2*y**2 + x**2)/z**2*np.exp((y**2 + x**2)**(1/2)/z)/(np.exp((y**2 + x**2)**(1/2)/z) +1)**2
 
@@ -72,7 +77,7 @@ def dIdz(x,z):
 
 def Thermal_QED_corrections_to_me(x,z): #(A.6)
 
-    y = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y = qed_y_grid(z)
 
     Integrand_me = y**2/(y**2 + x**2)**(1/2)*1/(np.exp((y**2 + x**2)**(1/2)/z) +1)
 
@@ -108,7 +113,7 @@ def Thermal_QED_corrections_to_z(x,z): #(A.16) and (A.17)
 
 def K(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -123,7 +128,7 @@ def K(x,z):
 
 def J(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -138,7 +143,7 @@ def J(x,z):
 
 def Y(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -153,7 +158,7 @@ def Y(x,z):
 
 def k(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -168,7 +173,7 @@ def k(x,z):
 
 def j(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -184,7 +189,7 @@ def j(x,z):
 
 def dKdw(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -200,7 +205,7 @@ def dKdw(x,z):
 
 def dJdw(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -215,7 +220,7 @@ def dJdw(x,z):
 
 def dYdw(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -230,7 +235,7 @@ def dYdw(x,z):
 
 def djdw(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z

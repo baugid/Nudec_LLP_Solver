@@ -2,16 +2,25 @@ import numpy as np
 from scipy import integrate
 from Constants import *
 import Momentum_Grid
+
+
+def qed_y_grid(z):
+    """QED/electron grid with a fixed dimensionless u = y/z range."""
+    return z * np.linspace(Momentum_Grid.yQED_min, Momentum_Grid.yQED_max, Momentum_Grid.n_QED)
+
+
 def Energy_density_ideal_gas(x,z,f_nue,f_numu,f_nutau,f_nue_bar,f_numu_bar,f_nutau_bar):
 
     #energy densities in comoving volume
 
-    y = Momentum_Grid.gridVals #(comoving) momentum
+    y_e = qed_y_grid(z) #(comoving) momentum
 
-    Integrand_rho_e_bar = y**2*(y**2 + x**2)**(1/2)/(np.exp((y**2 + x**2)**(1/2)/z) + 1)
+    Integrand_rho_e_bar = y_e**2*(y_e**2 + x**2)**(1/2)/(np.exp((y_e**2 + x**2)**(1/2)/z) + 1)
+
+    y = Momentum_Grid.gridVals
     Integrand_rho_nu_bar = y**3*(f_nue+f_numu+f_nutau+f_nue_bar+f_numu_bar+f_nutau_bar)
 
-    rho_e_bar = 2/(np.pi**2)*np.sum(Integrand_rho_e_bar*Momentum_Grid.gridWeights) #Energy density for e^\pm in comoving volume
+    rho_e_bar = 2/(np.pi**2)*integrate.simpson(Integrand_rho_e_bar, x=y_e) #Energy density for e^\pm in comoving volume
     rho_nu_bar = 1/(2*np.pi**2)*np.sum(Integrand_rho_nu_bar*Momentum_Grid.gridWeights) #Total neutrino and anti-neutrino energy density
 
     return rho_e_bar, rho_nu_bar
@@ -57,7 +66,7 @@ def Functions_in_z_ideal_gas_mu_pi(x,z):
 
 def J(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -72,7 +81,7 @@ def J(x,z):
 
 def Y(x,z):
 
-    y    = np.linspace(Momentum_Grid.yQED_min,Momentum_Grid.yQED_max,Momentum_Grid.n_QED)
+    y    = qed_y_grid(z)
     u    = y/z
     w    = x/z
     dudy = 1/z
@@ -85,7 +94,7 @@ def Y(x,z):
 
 def Jmu(x,z):
 
-    y    = np.linspace(Momentum_Grid.y_min,Momentum_Grid.y_max,Momentum_Grid.n)
+    y    = Momentum_Grid.gridVals
     u    = y/z
     w    = x/z
     dudi = 1/z

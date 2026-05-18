@@ -1,57 +1,110 @@
-# Nudec_LLP_Solver
+# Nu Decoupling Simple
 
-This is the Boltzmann solver for tracing neutrino momentum distributions to study the impact of hypothetical Long-Lived Particles (LLPs) on the cosmic neutrinos in the MeV primordial plasma.
+This code evolves neutrino momentum distributions in the MeV plasma with LLP decays into electromagnetic particles, metastable particles, and neutrinos. The main entry point for production runs is `basicRunner_cli.py`.
 
-The code has been developed by Kensuke Akita, Gideon Baur, and Maksym Ovchynnikov. The underlying physics and technical details are described in the associated preprints [2411.00892](https://arxiv.org/abs/2411.00892) and [2411.00931](https://arxiv.org/abs/2411.00931). If you use this code, please cite these references.
+The code was developed by Kensuke Akita, Gideon Baur, and Maksym Ovchynnikov. The physics setup is described in arXiv:2411.00892 and arXiv:2411.00931.
 
-The code currently incorporates decaying processes of LLPs to stable electromagnetic particles (photons and electrons), metastable particles (charged pions and muons), and neutrinos.
-The non-equilibrium evolution of the injected metastable particles: decays, annihilations, and interactions with nucleons can be computed in the companion code [Metastable-dynamics](https://github.com/maksymovchynnikov/Metastable-dynamics).
+## Python Environment
 
-## How to use (key study)
+If the system Python gives NumPy/SciPy/numba consistency or binary-compatibility errors, use a virtual environment. This avoids mixing packages from system Python, `~/.local`, and cluster modules.
 
-Focus on EM-philic/neutrinophilic decays, and energy conservation checks. More info: [ChatGPT chat](https://chatgpt.com/share/69ce552a-2f74-8390-ae7e-a26c90c3a57a)
-
-Main file: `basicRunner_cli.py`. Before launching, change the following line to the appropriate one:
-
-```
-OUTPUT_ROOT_DEFAULT = Path("/eos/user/o/ovchynni/Traditional")
-```
-
-In case of additional problems, contact me.
-
-Launches:
-
-```
-python basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 101 --ifDebugging False 
-```
-```
-python basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 101 --ifDebugging True
-``` 
-
-```
-python basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 201 --ifDebugging False
+```bash
+cd /eos/user/o/ovchynni/Nu_Decoupling_Simple
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install numpy scipy numba
+python -m py_compile basicRunner_cli.py
 ```
 
-```
-python basicRunner_cli.py --llp-mass 200 --llp-lifetime 0.1 --llp-abundance 4.73 --llp-two-nu-decay-e 0.33333 --llp-two-nu-decay-mu 0.33333 --llp-two-nu-decay-tau 0.33334 --nbins 201 --ifDebugging True
+When the venv is active, install and launch with the same interpreter:
+
+```bash
+python -m pip install numpy scipy numba
+python basicRunner_cli.py --help
 ```
 
-The output:
+## Single Runs
 
-```
-T_start = 5.1101422997e+00 MeV T_fin = 2.4195485397e-02 MeV n_nu_e/n_gamma = 2.1802640503e-01 n_nu_mu/n_gamma = 1.9781177313e-01 n_nu_tau/n_gamma = 1.9781173089e-01 ((a*T)_start/(a*T)_fin)^3 = 2.1973125249e-01 N_eff = 2.6724780319e+00 Accepted steps = 1124 RHS evaluations = 3647 Runtime = 326.6041 s
-```
+`basicRunner_cli.py` writes outputs under:
 
-```
-T_start = 5.1101422997e+00 MeV T_fin = 2.4307161185e-02 MeV n_nu_e/n_gamma = 2.1727380588e-01 n_nu_mu/n_gamma = 1.9653497346e-01 n_nu_tau/n_gamma = 1.9653493200e-01 ((a*T)_start/(a*T)_fin)^3 = 2.1671657377e-01 N_eff = 2.6481423226e+00 Accepted steps = 1071 RHS evaluations = 3338 Runtime = 404.0000 s
+```text
+/eos/user/o/ovchynni/Traditional/<output-folder>
 ```
 
-```
-T_start = 5.1101422997e+00 MeV T_fin = 2.4209828181e-02 MeV n_nu_e/n_gamma = 2.0892315329e-01 n_nu_mu/n_gamma = 1.8929449964e-01 n_nu_tau/n_gamma = 1.8929445423e-01 ((a*T)_start/(a*T)_fin)^3 = 2.1934095343e-01 N_eff = 2.6669071938e+00 Accepted steps = 1143 RHS evaluations = 3803 Runtime = 2572.5953 s
+The `--output-folder` argument is required and must be a simple folder name, not a path.
+
+Example neutrinophilic run:
+
+```bash
+cd /eos/user/o/ovchynni/Nu_Decoupling_Simple
+source .venv/bin/activate
+python basicRunner_cli.py \
+  --llp-mass 200 \
+  --llp-lifetime 0.1 \
+  --llp-abundance 4.73 \
+  --llp-pion-branching 0 \
+  --llp-muon-branching 0 \
+  --llp-two-nu-decay-e 0.33333 \
+  --llp-two-nu-decay-mu 0.33333 \
+  --llp-two-nu-decay-tau 0.33334 \
+  --nbins 301 \
+  --Tstart 5.0 \
+  --output-folder Neutrinophilic-uniform-final \
+  --ifDebugging False
 ```
 
-```
-T_start = 5.1101422997e+00 MeV T_fin = 2.4382902451e-02 MeV n_nu_e/n_gamma = 2.0796659183e-01 n_nu_mu/n_gamma = 1.8757746964e-01 n_nu_tau/n_gamma = 1.8757742551e-01 ((a*T)_start/(a*T)_fin)^3 = 2.1470326317e-01 N_eff = 2.6312268193e+00 Accepted steps = 1056 RHS evaluations = 3323 Runtime = 3066.2598 s
+Example electromagnetic reheating run:
+
+```bash
+python basicRunner_cli.py \
+  --llp-mass 50 \
+  --llp-lifetime 0.2 \
+  --llp-abundance 3156.955 \
+  --llp-pion-branching 0 \
+  --llp-muon-branching 0 \
+  --llp-two-nu-decay-e 0 \
+  --llp-two-nu-decay-mu 0 \
+  --llp-two-nu-decay-tau 0 \
+  --nbins 301 \
+  --Tstart 5.0 \
+  --output-folder EM-reheating-fixed \
+  --ifDebugging False
 ```
 
-The output shows that there is likely an issue with the energy conservation of neutrino self-interaction collision integral that does not shrink if increasing the number of bins, and its cumulative impact of Delta N_eff is non-negligible.  
+Each run appends one row to `<output-folder>/output.txt` and writes distribution and thermodynamics snapshots for the generated run id.
+
+## Batch Submissions
+
+Batch helpers are in `Batch-submissions/`.
+
+The example parameter files are:
+
+```text
+Batch-submissions/parameters-EM-reheating.txt
+Batch-submissions/parameters-neutrinophilic-uniform.txt
+```
+
+Each non-comment row has 10 columns:
+
+```text
+llp_mass llp_lifetime llp_abundance llp_pionBranching llp_muonBranching llp_twoNuDecayE llp_twoNuDecayMu llp_twoNuDecayTau nbins T_start
+```
+
+Create and submit an EM-reheating batch:
+
+```bash
+cd /eos/user/o/ovchynni/Nu_Decoupling_Simple/Batch-submissions
+python sub-creator.py parameters-EM-reheating.txt EM-reheating-fixed
+condor_submit condor_basicRunner_cli_EM-reheating-fixed.sub
+```
+
+Create and submit a neutrinophilic batch:
+
+```bash
+cd /eos/user/o/ovchynni/Nu_Decoupling_Simple/Batch-submissions
+python sub-creator.py parameters-neutrinophilic-uniform.txt Neutrinophilic-uniform-final
+condor_submit condor_basicRunner_cli_Neutrinophilic-uniform-final.sub
+```
+
+`sub-creator.py` validates the parameter file, creates/updates the run wrapper and log directory inside `Batch-submissions/`, and writes the Condor `.sub` file to the directory from which the script is launched. It does not create or require a manifest file.

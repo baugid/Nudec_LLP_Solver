@@ -1,0 +1,11 @@
+executable = /eos/user/o/ovchynni/Nu_Decoupling_Simple/Batch-submissions/run_EM-reheating-fixed.sh
+arguments = $(llp_mass) $(llp_lifetime) $(llp_abundance) $(llp_pion_branching) $(llp_muon_branching) $(llp_two_nu_decay_e) $(llp_two_nu_decay_mu) $(llp_two_nu_decay_tau) $(nbins) $(T_start)
+transfer_output_files = ""
+request_cpus = 1
++JobFlavour = "testmatch"
+log = /eos/user/o/ovchynni/Nu_Decoupling_Simple/Batch-submissions/logs/EM-reheating-fixed/basicRunner_$(Process).log
+error = /eos/user/o/ovchynni/Nu_Decoupling_Simple/Batch-submissions/logs/EM-reheating-fixed/basicRunner_$(Process).err
+output = /dev/null
++AccountingGroup = "group_u_BE.ABP.NORMAL"
+
+queue llp_mass, llp_lifetime, llp_abundance, llp_pion_branching, llp_muon_branching, llp_two_nu_decay_e, llp_two_nu_decay_mu, llp_two_nu_decay_tau, nbins, T_start from /eos/user/o/ovchynni/Nu_Decoupling_Simple/Batch-submissions/parameters-EM-reheating.txt

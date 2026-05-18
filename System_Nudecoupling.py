@@ -27,7 +27,7 @@ import Constants as C
 import Momentum_Grid
 from Averaged_Nu_Osc import *
 import Distributions
-from globalParameters import debugOutput, ifDebugging
+from GlobalParameters import debugOutput, ifDebugging
 
 
 def rotationMatrix(th, d):
@@ -105,7 +105,32 @@ def get_debugging_mode() -> bool:
     return bool(DEBUG_SUBTRACT_SELF_FROM_Z or DEBUG_PRINT_SELF_Z_TEST)
 
 
-def System_Nudec(x, sys_values, llp_count, llp_lifetime, llp_mass, branching_fractions, stopPoint, decayHandler, no_interactions=False):
+def injection_is_active(x, t, stopPoint, injection_cutoff_time_s=None, llp_time_offset_s=0.0):
+    """
+    Return whether LLP decay products should still be injected.
+
+    New callers should pass injection_cutoff_time_s so the cutoff is applied to
+    the actual cosmic time evolved by the solver. If omitted, keep the legacy
+    x-based cutoff for backwards compatibility.
+    """
+    if injection_cutoff_time_s is None:
+        return bool(x < stopPoint)
+    return bool(float(t) - float(llp_time_offset_s) < float(injection_cutoff_time_s))
+
+
+def System_Nudec(
+    x,
+    sys_values,
+    llp_count,
+    llp_lifetime,
+    llp_mass,
+    branching_fractions,
+    stopPoint,
+    decayHandler,
+    no_interactions=False,
+    injection_cutoff_time_s=None,
+    llp_time_offset_s=0.0,
+):
     """
     Right-hand side of the coupled system in variable x.
     """
@@ -115,9 +140,6 @@ def System_Nudec(x, sys_values, llp_count, llp_lifetime, llp_mass, branching_fra
     if debugOutput:
         print(callNumber)
         print(x)
-
-    if callNumber == 1 or callNumber % 5 == 0:
-        print(f"Progress: x = {x:.5f}")
 
     start = time.time()
 
@@ -133,6 +155,8 @@ def System_Nudec(x, sys_values, llp_count, llp_lifetime, llp_mass, branching_fra
 
     z = sys_values[3 * n]
     t = sys_values[3 * n + 1]
+    elapsed_t = max(0.0, float(t) - float(llp_time_offset_s))
+    injecting = injection_is_active(x, t, stopPoint, injection_cutoff_time_s, llp_time_offset_s)
 
     # Ideal-gas energy densities and auxiliaries
     rho_e_bar, rho_nu_bar = Energy_density_ideal_gas(
@@ -147,7 +171,7 @@ def System_Nudec(x, sys_values, llp_count, llp_lifetime, llp_mass, branching_fra
     G2_1, G2_2, G3_1, G3_2 = Thermal_QED_corrections_to_z(x, z)
 
     # LLP density (comoving)
-    llp_density = llp_count * np.exp(-t / llp_lifetime) * (me / x) ** 3
+    llp_density = llp_count * np.exp(-elapsed_t / llp_lifetime) * (me / x) ** 3
 
     # Total energy density in comoving volume
     rho_bar = (
@@ -170,7 +194,7 @@ def System_Nudec(x, sys_values, llp_count, llp_lifetime, llp_mass, branching_fra
     df_nudx = np.zeros((3, n))
     momentumVals = y * me / x
 
-    if x < stopPoint:
+    if injecting:
         decayProbabilites = decayHandler(z / x * me)
 
         for branching, distri in zip(branching_fractions, Distributions.getDistribution):
@@ -246,7 +270,7 @@ def System_Nudec(x, sys_values, llp_count, llp_lifetime, llp_mass, branching_fra
     else:
         drho_nudx_for_z = drho_nudx
 
-    if x < stopPoint:
+    if injecting:
         drho_llpdx = -llp_mass * (x / me / z) ** 3 * (dllpdt / (trueHubble * x)) * x / me / 2
     else:
         drho_llpdx = 0.0
